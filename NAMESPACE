@@ -1,0 +1,4 @@
+export("tlnise")
+export("initTLNise")
+
+useDynLib(tlnise)
