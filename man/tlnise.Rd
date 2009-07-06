@@ -9,11 +9,9 @@
   Two level Normal independent sampling estimation
 }
 \usage{
-tlnise(Y, V, w = NA, V0 = NA, prior = NA, N = 1000, seed = 10,
+tlnise(Y, V, w = NA, V0 = NA, prior = NA, N = 1000, seed = NULL,
        Tol = 1e-06, maxiter = 1000, intercept = TRUE, labelY = NA,
        labelYj = NA, labelw = NA, digits = 4, brief = 1, prnt = TRUE)
-
-initTLNise()
 }
 
 \arguments{
@@ -23,7 +21,7 @@ initTLNise()
   \item{V0}{"typical" Vj (default is average of Vj's)}
   \item{prior}{prior parameter (see Details)}
   \item{N}{number of Constrained Wishart draws for inference}
-  \item{seed}{seed for random number generator}
+  \item{seed}{seed for the random number generator}
   \item{Tol}{tolerance for determining modal convergence}
   \item{maxiter}{maximum number of EM iterations for finding mode}
   \item{intercept}{if \code{TRUE}, an intercept term is included in the regression}
@@ -43,12 +41,6 @@ initTLNise()
   \code{prior = 0} is the Jeffreys' prior, and \code{prior = (p+1)}
   is the uniform prior on shrinkage matrix B0.
   
-}
-\note{
-  \code{initTLNise} needs to be called to initialize the random number
-  generator used by \code{tlnise}.  Once \code{initTLNise} is called,
-  the \code{seed} argument to \code{tlnise} to be used (for
-  reproducibility of results). 
 }
 \value{
   \code{tlnise} returns a list, the precise contents of which depends on
@@ -86,7 +78,6 @@ initTLNise()
 x <- rnorm(10)  ## Second level
 y <- rnorm(10, x)  ## First level means
 
-initTLNise()
 out <- tlnise(Y = y, V = rep(1, 10), w = rep(1, 10), seed = 1234)
 }
 \keyword{models}% at least one, from doc/KEYWORDS
