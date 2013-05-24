@@ -5,6 +5,21 @@
 ######################################################################
 ## Minor changes for R port Copyright (C) 2004-2005, Roger D. Peng <rpeng@jhsph.edu>
 ######################################################################
+## This program is free software; you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation; either version 2 of the License, or
+## (at your option) any later version.
+##
+## This program is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+##
+## You should have received a copy of the GNU General Public License
+## along with this program; if not, write to the Free Software
+## Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+###############################################################################
+
 
 tlnise<-function(Y,V,w=NA,V0=NA,prior=NA,N=1000,seed=NULL,
                  Tol=1e-6,maxiter=1000,intercept=TRUE,labelY=NA,labelYj=NA,
@@ -102,7 +117,8 @@ tlnise<-function(Y,V,w=NA,V0=NA,prior=NA,N=1000,seed=NULL,
     prior<-out.chk$prior
     if(prnt)
         print(paste("******** Prior Parameter =",prior),quote=FALSE)
-    if(missing(V0)) V0<-apply(V,c(1,2),mean)
+    if(missing(V0))
+            V0 <- rowMeans(V, dims = 2)
     if(max(abs(V0-diag(p))) < Tol){
         Ys<-Y
         Vs<-V
@@ -454,21 +470,18 @@ checkcon<-function(Y,V,w,intercept,prior,prnt){
 }
 
 
-standard.f<-function(Y,V,Vo){
-    ## Y is pxJ, V is pxpxJ and Vo is pxp. Generates rtVo, the
-    ## symmetric square root matrix for Vo. Returns rtVo^{-1}%*%Y, 
-    ##  rtVo^{-1}%*%V%*%rtVo^{-1}, and rtVo.
-    p<-dim(Vo)[1]
-    J<-dim(V)[3]
-    Yj<-rep(0,p)
-    Vj<-rtVo<-0*Vo
-    indxp<-rep(0,p)
-    out<-.Fortran("standardize", Y=Y, V=V, Vo=Vo,as.integer(p),as.integer(J), 
-                  as.double(Yj), Vj=Vj,rtVo=rtVo,as.integer(indxp),
-                  PACKAGE = "tlnise")
-    list(Y=out$Y, V=out$V, rtVo=out$rtVo)
+standard.f <- function(Y, V, V0) {
+        s <- svd(V0)
+        n <- length(s$d)
+        rtV0 <- s$u %*% diag(sqrt(s$d), n, n) %*% t(s$v)
+        Ys <- solve(rtV0, Y)  ## rtV0^{-1} Y
+        Vs <- array(dim = dim(V))
+        for(i in seq_len(dim(Vs)[3])) {
+                ## rtV0^{-1} V rtV0^{-1}
+                Vs[, , i] <- solve(rtV0, t(solve(rtV0, V[, , i])))
+        }
+        list(Y = Ys, V = Vs, rtVo = rtV0)
 }
-
 
 mammult<-function(M,A,tM){
     ## Calls Fortran subroutine "mammult" to pre-multiply by M

@@ -1,3 +1,21 @@
+C############# Copyright 2000, Phil Everson, Swarthmore College. ##############
+C#####################################################################
+C# Minor changes for R port Copyright (C) 2004-2005, Roger D. Peng <rpeng@jhsph.edu>
+C#####################################################################
+C# This program is free software; you can redistribute it and/or modify
+C# it under the terms of the GNU General Public License as published by
+C# the Free Software Foundation; either version 2 of the License, or
+C# (at your option) any later version.
+C#
+C# This program is distributed in the hope that it will be useful,
+C# but WITHOUT ANY WARRANTY; without even the implied warranty of
+C# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+C# GNU General Public License for more details.
+C#
+C# You should have received a copy of the GNU General Public License
+C# along with this program; if not, write to the Free Software
+C# Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+
 C This file contains subroutines called by the Splus function "tlnise"
 C (version mv1). (See Everson & Morris (2000) JRSS-B for details).
 C  
@@ -718,12 +736,12 @@ C
       INTEGER step, p, i, j, accept
       DOUBLE PRECISION Tmat(p,p), dt, Zt(p), Ut, Deltinv(p,p) 
       DOUBLE PRECISION H11(p,p), H12(p), H22, lambda
-      DOUBLE PRECISION tempp(p),  x
+      DOUBLE PRECISION tempp(p),  x(1,1)
 C
       call mmult(Tmat, Zt, p, p, 1, tempp, step-1, step-1, 1) 
       call mmult(Deltinv, tempp, p,p,1, H12, step-1, step-1, 1) 
       call mmult(tempp, H12, 1, p, 1, x, 1, step-1, 1)
-      lambda = dt - Ut - x
+      lambda = dt - Ut - x(1,1)
 C
       if(lambda.lt.0.) then
        accept = 0
